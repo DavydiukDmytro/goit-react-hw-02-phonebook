@@ -3,7 +3,6 @@ import { ContactList } from 'components/ContactList';
 import { Form } from 'components/Form';
 import { Filter } from 'components/Filter';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import { array } from 'prop-types';
 import { Container, TitleH1, TitleH2 } from './App.styled';
 
 export class App extends Component {
@@ -42,31 +41,27 @@ export class App extends Component {
   };
 
   deleteContact = id => {
-    const index = this.state.contacts.findIndex(contact => contact.id === id);
-    if (index !== -1) {
-      array = this.state.contacts;
-      array.splice(index, 1);
-      this.setState(state => ({
-        contacts: [...array],
-      }));
-    }
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id),
+    }));
   };
 
+  filterArr = () =>
+    this.state.contacts.filter(contact =>
+      contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
+    );
+
   render() {
-    const { contacts, filter } = this.state;
-    const { addContact, handleChangeValueInState, deleteContact } = this;
+    const { filter } = this.state;
+    const { addContact, handleChangeValueInState, deleteContact, filterArr } =
+      this;
     return (
       <Container>
         <TitleH1>Phonebook</TitleH1>
         <Form onSubmitAdd={addContact} />
         <Filter filter={filter} onKeyClick={handleChangeValueInState} />
         <TitleH2>Contacts</TitleH2>
-        <ContactList
-          onDelete={deleteContact}
-          contactArr={contacts.filter(contact =>
-            contact.name.toLowerCase().includes(filter.toLowerCase())
-          )}
-        />
+        <ContactList onDelete={deleteContact} contactArr={filterArr()} />
       </Container>
     );
   }
